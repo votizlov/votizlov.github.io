@@ -18,20 +18,48 @@
     <span>Send</span>
   </button>
 </form>
-  <iframe width="560" height="315" src="https://www.youtube.com/embed/k2yLMW72dpE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-  <button type='button' id ='mute'>Mute</button>
+  <div id="player"></div>
   <script>
-    $(document).ready(function() {
-       $('#mute').click(function(){
-         if (video.muted = false) {    
-           video.muted = true;
-          }
+    // 2. This code loads the IFrame Player API code asynchronously.
+  var tag = document.createElement('script');
 
-          else {
-           video.muted = false;
-          }
-         });
-       });
+  // This is a protocol-relative URL as described here:
+  //     http://paulirish.com/2010/the-protocol-relative-url/
+  // If you're testing a local page accessed via a file:/// URL, please set tag.src to
+  //     "https://www.youtube.com/iframe_api" instead.
+  tag.src = "//www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  // 3. This function creates an <iframe> (and YouTube player)
+  //    after the API code downloads.
+ var player;
+var isUnMuted = false;
+window.onYouTubeIframeAPIReady = function() {
+    player = new YT.Player('youTube', {
+        videoId: '[myVideoId]',
+        playerVars: {
+            'rel': 0,
+        },
+        events: {
+            'onReady': function() {
+                player.mute();
+                player.playVideo();
+            },
+            'onStateChange': function () {
+                if (player.isMuted() && player.getPlayerState() == 2 && !isUnMuted) {
+                    player.unMute();
+                    player.playVideo();
+                    isUnMuted = true;
+                }
+            }
+        }
     });
+}
+
+  // 4. The API will call this function when the video player is ready.
+  function onPlayerReady(event) {
+    event.target.mute();
+  }
   </script>
 </html>
